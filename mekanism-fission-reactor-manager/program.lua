@@ -33,10 +33,6 @@ local externalAlarmStatus = false
 local stillAliveString = "."
 local stillAliveTimer = 20
 
-local reactorDisconnected = false
-local boilerDisconnected = false
-local turbineDisconnected = false
-
 local reactorTemperature = -1
   
 local reactorCoolantAmount = -1
@@ -373,16 +369,12 @@ function reactorStatusManager()
   if reactorStatus ~= reactorEnabled then
     if reactorStatus == true then
       if reactor.getStatus() == false then
-        if reactor ~= nil then
-          reactor.setBurnRate(0)
-          reactor.activate()
-        end
+        reactor.setBurnRate(0)
+        reactor.activate()
       end
     else
       if reactor.getStatus() == true then
-        if reactor ~= nil then
-          reactor.scram()
-        end
+        reactor.scram()
       end
     end
   end
@@ -392,21 +384,6 @@ function reactorSafetyCheck()
   reactorSafetyMessages = ""
   alarmStatus = false
   externalAlarmStatus = false
-  if reactorDisconnected == true then
-    reactorStatus = false
-    reactorSafetyMessages = reactorSafetyMessages .. ", REACTOR"
-    alarmStatus = true
-  end
-  if boilerDisconnected == true then
-    reactorStatus = false
-    reactorSafetyMessages = reactorSafetyMessages .. ", BOILER"
-    alarmStatus = true
-  end
-  if turbineDisconnected == true then
-    reactorStatus = false
-    reactorSafetyMessages = reactorSafetyMessages .. ", TURBINE"
-    alarmStatus = true
-  end
   if reactorDamage >= 1 then
     reactorStatus = false
     reactorSafetyMessages = reactorSafetyMessages .. ", DAMAGE"
@@ -422,7 +399,7 @@ function reactorSafetyCheck()
     reactorSafetyMessages = reactorSafetyMessages .. ", WASTE"
     alarmStatus = true
   end
-  if reactorCoolantFilledPercentage <= 0.9 then
+  if reactorCoolantFilledPercentage <= 0.5 then
     reactorStatus = false
     reactorSafetyMessages = reactorSafetyMessages .. ", COOLANT"
     alarmStatus = true
@@ -463,76 +440,6 @@ function stillAliveDisplay()
   end
 end
 
-function getReactorValues()
-  reactorEnabled = reactor.getStatus()
-
-    reactorTemperature = reactor.getTemperature()
-  
-    reactorCoolantAmount = reactor.getCoolant()["amount"]
-    reactorCoolantCapacity = reactor.getCoolantCapacity()
-    reactorCoolantFilledPercentage = reactor.getCoolantFilledPercentage()
-    reactorCoolantNeeded = reactor.getCoolantNeeded()
-
-    reactorHeatedCoolantAmount = reactor.getHeatedCoolant()["amount"]
-    reactorHeatedCoolantCapacity = reactor.getHeatedCoolantCapacity()
-    reactorHeatedCoolantFilledPercentage = reactor.getHeatedCoolantFilledPercentage()
-    reactorHeatedCoolantNeeded = reactor.getHeatedCoolantNeeded()
-
-    reactorDamage = reactor.getDamagePercent()
-
-    reactorFuelAmount = reactor.getFuel()["amount"]
-    reactorFuelCapacity = reactor.getFuelCapacity()
-    reactorFuelFilledPercentage = reactor.getFuelFilledPercentage()
-
-    reactorCurrentBurnRate = reactor.getActualBurnRate()
-    reactorBurnRate = reactor.getBurnRate()
-    reactorMaxBurnRate = reactor.getMaxBurnRate()
-
-    reactorWasteAmount = reactor.getWaste()["amount"]
-    reactorWasteCapacity = reactor.getWasteCapacity()
-    reactorWasteFilledPercentage = reactor.getWasteFilledPercentage()
-end
-
-function getBoilerValues()
-  boilerTemperature = boiler.getTemperature()
-  
-  boilerWaterAmount = boiler.getWater()["amount"]
-  boilerWaterCapacity = boiler.getWaterCapacity()
-  boilerWaterFilledPercentage = boiler.getWaterFilledPercentage()
-
-  boilerSteamAmount = boiler.getSteam()["amount"]
-  boilerSteamCapacity = boiler.getSteamCapacity()
-  boilerSteamFilledPercentage = boiler.getSteamFilledPercentage()
-
-  boilerCooledCoolantAmount = boiler.getCooledCoolant()["amount"]
-  boilerCooledCoolantCapacity = boiler.getCooledCoolantCapacity()
-  boilerCooledCoolantFilledPercentage = boiler.getCooledCoolantFilledPercentage()
-
-  boilerHeatedCoolantAmount = boiler.getHeatedCoolant()["amount"]
-  boilerHeatedCoolantCapacity = boiler.getHeatedCoolantCapacity()
-  boilerHeatedCoolantFilledPercentage = boiler.getHeatedCoolantFilledPercentage()
-
-  boilerBoilRate = boiler.getBoilRate()
-  boilerMaxBoilRate = boiler.getMaxBoilRate()
-  boilerBoilCapacity = boiler.getBoilCapacity()
-end
-
-function getTurbineValues()
-  turbineSteamAmount = turbine.getSteam()["amount"]
-  turbineSteamCapacity = turbine.getSteamCapacity()
-  turbineSteamFilledPercentage = turbine.getSteamFilledPercentage()
-  turbineSteamInputRate = turbine.getLastSteamInputRate()
-  turbineFlowRate = turbine.getFlowRate()
-  turbineMaxFlowRate = turbine.getMaxFlowRate()
-  turbineDumpingMode = turbine.getDumpingMode()
-
-  turbineEnergyAmount = turbine.getEnergy()
-  turbineMaxEnergy = turbine.getMaxEnergy()
-  turbineEnergyFilledPercentage = turbine.getEnergyFilledPercentage()
-  turbineProductionRate = turbine.getProductionRate()
-  turbineMaxProduction = turbine.getMaxProduction()
-end
-
 function main()
   while(true) do
     updateBurnRateValueString = ""
@@ -563,87 +470,69 @@ end
 
 function values()
   while true do
-    if pcall(getReactorValues) then
-      reactorDisconnected = false
-    else
-      reactorDisconnected = true
-
-      reactorEnabled = false
-
-      reactorTemperature = -1
+    reactorTemperature = reactor.getTemperature()
   
-      reactorCoolantAmount = -1
-      reactorCoolantCapacity = -1
-      reactorCoolantFilledPercentage = -1
-      reactorCoolantNeeded = -1
+    reactorCoolantAmount = reactor.getCoolant()["amount"]
+    reactorCoolantCapacity = reactor.getCoolantCapacity()
+    reactorCoolantFilledPercentage = reactor.getCoolantFilledPercentage()
+    reactorCoolantNeeded = reactor.getCoolantNeeded()
 
-      reactorHeatedCoolantAmount = -1
-      reactorHeatedCoolantCapacity = -1
-      reactorHeatedCoolantFilledPercentage = -1
-      reactorHeatedCoolantNeeded = -1
+    reactorHeatedCoolantAmount = reactor.getHeatedCoolant()["amount"]
+    reactorHeatedCoolantCapacity = reactor.getHeatedCoolantCapacity()
+    reactorHeatedCoolantFilledPercentage = reactor.getHeatedCoolantFilledPercentage()
+    reactorHeatedCoolantNeeded = reactor.getHeatedCoolantNeeded()
 
-      reactorDamage = -1
+    reactorDamage = reactor.getDamagePercent()
 
-      reactorFuelAmount = -1
-      reactorFuelCapacity = -1
-      reactorFuelFilledPercentage = -1
+    reactorFuelAmount = reactor.getFuel()["amount"]
+    reactorFuelCapacity = reactor.getFuelCapacity()
+    reactorFuelFilledPercentage = reactor.getFuelFilledPercentage()
 
-      reactorCurrentBurnRate = -1
-      reactorBurnRate = -1
-      reactorMaxBurnRate = -1
+    reactorCurrentBurnRate = reactor.getActualBurnRate()
+    reactorBurnRate = reactor.getBurnRate()
+    reactorMaxBurnRate = reactor.getMaxBurnRate()
 
-      reactorWasteAmount = -1
-      reactorWasteCapacity = -1
-      reactorWasteFilledPercentage = -1
-    end
+    reactorWasteAmount = reactor.getWaste()["amount"]
+    reactorWasteCapacity = reactor.getWasteCapacity()
+    reactorWasteFilledPercentage = reactor.getWasteFilledPercentage()
   
-    if pcall(getBoilerValues) then
-      boilerDisconnected = false
-    else
-      boilerDisconnected = true
-
-      boilerTemperature = -1
+    boilerTemperature = boiler.getTemperature()
   
-      boilerWaterAmount = -1
-      boilerWaterCapacity = -1
-      boilerWaterFilledPercentage = -1
+    boilerWaterAmount = boiler.getWater()["amount"]
+    boilerWaterCapacity = boiler.getWaterCapacity()
+    boilerWaterFilledPercentage = boiler.getWaterFilledPercentage()
   
-      boilerSteamAmount = -1
-      boilerSteamCapacity = -1
-      boilerSteamFilledPercentage = -1
+    boilerSteamAmount = boiler.getSteam()["amount"]
+    boilerSteamCapacity = boiler.getSteamCapacity()
+    boilerSteamFilledPercentage = boiler.getSteamFilledPercentage()
   
-      boilerCooledCoolantAmount = -1
-      boilerCooledCoolantCapacity = -1
-      boilerCooledCoolantFilledPercentage = -1
+    boilerCooledCoolantAmount = boiler.getCooledCoolant()["amount"]
+    boilerCooledCoolantCapacity = boiler.getCooledCoolantCapacity()
+    boilerCooledCoolantFilledPercentage = boiler.getCooledCoolantFilledPercentage()
   
-      boilerHeatedCoolantAmount = -1
-      boilerHeatedCoolantCapacity = -1
-      boilerHeatedCoolantFilledPercentage = -1
+    boilerHeatedCoolantAmount = boiler.getHeatedCoolant()["amount"]
+    boilerHeatedCoolantCapacity = boiler.getHeatedCoolantCapacity()
+    boilerHeatedCoolantFilledPercentage = boiler.getHeatedCoolantFilledPercentage()
   
-      boilerBoilRate = -1
-      boilerMaxBoilRate = -1
-      boilerBoilCapacity = -1
-    end
+    boilerBoilRate = boiler.getBoilRate()
+    boilerMaxBoilRate = boiler.getMaxBoilRate()
+    boilerBoilCapacity = boiler.getBoilCapacity()
   
-    if pcall(getTurbineValues) then
-      turbineDisconnected = false
-    else
-      turbineDisconnected = true
-
-      turbineSteamAmount = -1
-      turbineSteamCapacity = -1
-      turbineSteamFilledPercentage = -1
-      turbineSteamInputRate = -1
-      turbineFlowRate = -1
-      turbineMaxFlowRate = -1
-      turbineDumpingMode = "UNKNOWN"
+    turbineSteamAmount = turbine.getSteam()["amount"]
+    turbineSteamCapacity = turbine.getSteamCapacity()
+    turbineSteamFilledPercentage = turbine.getSteamFilledPercentage()
+    turbineSteamInputRate = turbine.getLastSteamInputRate()
+    turbineFlowRate = turbine.getFlowRate()
+    turbineMaxFlowRate = turbine.getMaxFlowRate()
+    turbineDumpingMode = turbine.getDumpingMode()
   
-      turbineEnergyAmount = -1
-      turbineMaxEnergy = -1
-      turbineEnergyFilledPercentage = -1
-      turbineProductionRate = -1
-      turbineMaxProduction = -1
-    end
+    turbineEnergyAmount = turbine.getEnergy()
+    turbineMaxEnergy = turbine.getMaxEnergy()
+    turbineEnergyFilledPercentage = turbine.getEnergyFilledPercentage()
+    turbineProductionRate = turbine.getProductionRate()
+    turbineMaxProduction = turbine.getMaxProduction()
+  
+    reactorEnabled = reactor.getStatus()
   end
 end
 
