@@ -394,17 +394,17 @@ function reactorSafetyCheck()
   externalAlarmStatus = false
   if reactorDisconnected == true then
     reactorStatus = false
-    reactorSafetyMessages = reactorSafetyMessages .. ", REACTOR_DISCONNECT"
+    reactorSafetyMessages = reactorSafetyMessages .. ", REACTOR"
     alarmStatus = true
   end
   if boilerDisconnected == true then
     reactorStatus = false
-    reactorSafetyMessages = reactorSafetyMessages .. ", BOILER_DISCONNECT"
+    reactorSafetyMessages = reactorSafetyMessages .. ", BOILER"
     alarmStatus = true
   end
   if turbineDisconnected == true then
     reactorStatus = false
-    reactorSafetyMessages = reactorSafetyMessages .. ", TURBINE_DISCONNECT"
+    reactorSafetyMessages = reactorSafetyMessages .. ", TURBINE"
     alarmStatus = true
   end
   if reactorDamage >= 1 then
