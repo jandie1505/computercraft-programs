@@ -31,6 +31,7 @@ local alarmStatus = false
 local externalAlarmStatus = false
 
 local stillAliveString = "."
+local stillAliveTimer = 20
 
 local reactorTemperature = -1
   
@@ -425,12 +426,15 @@ function alarmStatusCheck()
 end
 
 function stillAliveDisplay()
-  if stillAliveString == "." then
-    stillAliveString = ".."
-  elseif stillAliveString == ".." then
-    stillAliveString = "..."
-  else
-    stillAliveString = "."
+  if stillAliveTimer <= 0 then
+    if stillAliveString == "." then
+      stillAliveString = ".."
+    elseif stillAliveString == ".." then
+      stillAliveString = "..."
+    else
+      stillAliveString = "."
+    end
+    stillAliveTimer = 20
   end
 end
 
