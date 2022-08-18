@@ -14,9 +14,9 @@ local monitor1 = peripheral.wrap(monitor1string)
 local monitor2 = peripheral.wrap(monitor2string)
 local monitor3 = peripheral.wrap(monitor3string)
 local monitor4 = peripheral.wrap(monitor4string)
-local reactor = nil
-local boiler = nil
-local turbine = nil
+local reactor = peripheral.wrap(reactorString)
+local boiler = peripheral.wrap(boilerString)
+local turbine = peripheral.wrap(turbineString)
 
 local updateBurnRate = {"0","0","0","0","0","0"}
 local updateBurnRateCurrentField = 1
@@ -493,10 +493,6 @@ end
 
 function values()
   while true do
-    reactor = peripheral.wrap(reactorString)
-    boiler = peripheral.wrap(boilerString)
-    turbine = peripheral.wrap(turbineString)
-
     if reactor ~= nil then
       reactorEnabled = reactor.getStatus()
 
