@@ -567,18 +567,82 @@ function values()
       reactorDisconnected = false
     else
       reactorDisconnected = true
+
+      reactorEnabled = false
+
+      reactorTemperature = -1
+  
+      reactorCoolantAmount = -1
+      reactorCoolantCapacity = -1
+      reactorCoolantFilledPercentage = -1
+      reactorCoolantNeeded = -1
+
+      reactorHeatedCoolantAmount = -1
+      reactorHeatedCoolantCapacity = -1
+      reactorHeatedCoolantFilledPercentage = -1
+      reactorHeatedCoolantNeeded = -1
+
+      reactorDamage = -1
+
+      reactorFuelAmount = -1
+      reactorFuelCapacity = -1
+      reactorFuelFilledPercentage = -1
+
+      reactorCurrentBurnRate = -1
+      reactorBurnRate = -1
+      reactorMaxBurnRate = -1
+
+      reactorWasteAmount = -1
+      reactorWasteCapacity = -1
+      reactorWasteFilledPercentage = -1
     end
   
     if pcall(getBoilerValues) then
       boilerDisconnected = false
     else
       boilerDisconnected = true
+
+      boilerTemperature = -1
+  
+      boilerWaterAmount = -1
+      boilerWaterCapacity = -1
+      boilerWaterFilledPercentage = -1
+  
+      boilerSteamAmount = -1
+      boilerSteamCapacity = -1
+      boilerSteamFilledPercentage = -1
+  
+      boilerCooledCoolantAmount = -1
+      boilerCooledCoolantCapacity = -1
+      boilerCooledCoolantFilledPercentage = -1
+  
+      boilerHeatedCoolantAmount = -1
+      boilerHeatedCoolantCapacity = -1
+      boilerHeatedCoolantFilledPercentage = -1
+  
+      boilerBoilRate = -1
+      boilerMaxBoilRate = -1
+      boilerBoilCapacity = -1
     end
   
     if pcall(getTurbineValues) then
       turbineDisconnected = false
     else
       turbineDisconnected = true
+
+      turbineSteamAmount = -1
+      turbineSteamCapacity = -1
+      turbineSteamFilledPercentage = -1
+      turbineSteamInputRate = -1
+      turbineFlowRate = -1
+      turbineMaxFlowRate = -1
+      turbineDumpingMode = "UNKNOWN"
+  
+      turbineEnergyAmount = -1
+      turbineMaxEnergy = -1
+      turbineEnergyFilledPercentage = -1
+      turbineProductionRate = -1
+      turbineMaxProduction = -1
     end
   end
 end
