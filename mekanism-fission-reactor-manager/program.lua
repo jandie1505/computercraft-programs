@@ -435,6 +435,8 @@ function stillAliveDisplay()
       stillAliveString = "."
     end
     stillAliveTimer = 20
+  else
+    stillAliveTimer = stillAliveTimer - 1
   end
 end
 
