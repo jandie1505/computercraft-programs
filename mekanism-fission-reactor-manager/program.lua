@@ -373,12 +373,16 @@ function reactorStatusManager()
   if reactorStatus ~= reactorEnabled then
     if reactorStatus == true then
       if reactor.getStatus() == false then
-        reactor.setBurnRate(0)
-        reactor.activate()
+        if reactor ~= nil then
+          reactor.setBurnRate(0)
+          reactor.activate()
+        end
       end
     else
       if reactor.getStatus() == true then
-        reactor.scram()
+        if reactor ~= nil then
+          reactor.scram()
+        end
       end
     end
   end
