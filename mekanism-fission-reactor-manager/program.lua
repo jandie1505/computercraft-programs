@@ -564,11 +564,11 @@ function values()
       turbineMaxFlowRate = turbine.getMaxFlowRate()
       turbineDumpingMode = turbine.getDumpingMode()
   
-      turbineEnergyAmount = turbine.getEnergy()
-      turbineMaxEnergy = turbine.getMaxEnergy()
+      turbineEnergyAmount = turbine.getEnergy() / 2.5
+      turbineMaxEnergy = turbine.getMaxEnergy() / 2.5
       turbineEnergyFilledPercentage = turbine.getEnergyFilledPercentage()
-      turbineProductionRate = turbine.getProductionRate()
-      turbineMaxProduction = turbine.getMaxProduction()
+      turbineProductionRate = turbine.getProductionRate() / 2.5
+      turbineMaxProduction = turbine.getMaxProduction() / 2.5
 
       turbineDisconnected = false
     else
