@@ -570,9 +570,9 @@ function values()
       turbineProductionRate = turbine.getProductionRate()
       turbineMaxProduction = turbine.getMaxProduction()
 
-      turbineDisconnected = true
-    else
       turbineDisconnected = false
+    else
+      turbineDisconnected = true
     end
   end
 end
