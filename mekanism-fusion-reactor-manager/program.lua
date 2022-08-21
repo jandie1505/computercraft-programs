@@ -37,8 +37,10 @@ local reactorPassiveGeneration = -1
 local reactorInjectionRate = -1
 local reactorMinInjectionRate = -1
 
+local reactorHohlraumAvail = false
+
 local reactorEnabled = false
-local reactorRequiredBurnRate = 2
+local reactorRequiredInjectionRate = 2
 
 local monitor1 = peripheral.wrap(monitor1string)
 local monitor2 = peripheral.wrap(monitor2string)
@@ -47,11 +49,11 @@ local monitor3 = peripheral.wrap(monitor3string)
 local stillAliveString = "."
 local stillAliveTimer = 20
 
-local updateBurnRate = {"0","0","0","0","0","0","0"}
-local updateBurnRateCurrentField = 1
-local updateBurnRateValueString = ""
-local updateBurnValueCalc = ""
-local updateBurnValue = 0
+local updateInjectionRate = {"0","0"}
+local updateInjectionRateCurrentField = 1
+local updateInjectionRateValueString = ""
+local updateInjectionRateValueCalc = ""
+local updateInjectionRateValue = 0
 
 -- local
 
@@ -141,18 +143,44 @@ function updateMonitor2()
     monitor2.write("INJECTION RATE:")
     monitor2.setCursorPos(1,4)
     monitor2.clearLine()
-    monitor2.write(reactorInjectionRate .. " (required: " .. reactorMinInjectionRate .. ")")
+    monitor2.write("Current: " .. reactorInjectionRate .. " (set: " .. reactorRequiredInjectionRate ..  ", min: " .. reactorMinInjectionRate .. ")")
+
+    monitor2.setCursorPos(1,6)
+    monitor2.clearLine()
+    monitor2.write("HOHLRAUM:")
+    monitor2.setCursorPos(1,7)
+    monitor2.clearLine()
+    if reactorHohlraumAvail == true then
+        monitor2.write("available")
+    else
+        monitor2.write("available")
+    end
+
+    monitor2.setBackgroundColor(colors.black)
+    monitor2.setCursorPos(42,14)
+    monitor2.clearLine()
+    monitor2.setBackgroundColor(colors.gray)
+    monitor2.write("Set Rate:")
+    monitor2.setBackgroundColor(colors.black)
+
+    monitor2.setCursorPos(42,15)
+    monitor2.clearLine()
+    monitor2.setBackgroundColor(colors.gray)
+    monitor2.write("> " .. updateInjectionRateValueString .. "     ")
+    monitor2.setBackgroundColor(colors.black)
 
     monitor2.setCursorPos(42,16)
     monitor2.clearLine()
     monitor2.setBackgroundColor(colors.gray)
     monitor2.write("[1][2][3]")
     monitor2.setBackgroundColor(colors.black)
+
     monitor2.setCursorPos(42,17)
     monitor2.clearLine()
     monitor2.setBackgroundColor(colors.gray)
     monitor2.write("[4][5][6]")
     monitor2.setBackgroundColor(colors.gray)
+
     monitor2.setCursorPos(1,18)
     monitor2.clearLine()
     monitor2.write("REACTOR: ")
@@ -175,6 +203,7 @@ function updateMonitor2()
     monitor2.setBackgroundColor(colors.gray)
     monitor2.write("[7][8][9]")
     monitor2.setBackgroundColor(colors.gray)
+
     monitor2.setCursorPos(1,19)
     monitor2.clearLine()
     monitor2.write("IGNITION: ")
@@ -189,6 +218,22 @@ function updateMonitor2()
     monitor2.setBackgroundColor(colors.gray)
     monitor2.write("[C][0][>]")
     monitor2.setBackgroundColor(colors.black)
+end
+
+function manageInjectionRate()
+    local reactor = peripheral.wrap(reactorString)
+
+    if reactor ~= nil then
+        if reactorEnabled == true then
+            if reactorInjectionRate ~= reactorRequiredInjectionRate then
+                reactor.setInjectionRate(reactorRequiredInjectionRate)
+            end
+        else
+            if reactorInjectionRate ~= 0 then
+                reactor.setInjectionRate(0)
+            end
+        end
+    end
 end
 
 function values()
@@ -223,13 +268,154 @@ function values()
 
         reactorInjectionRate = reactor.getInjectionRate()
         reactorMinInjectionRate = reactor.getMinInjectionRate(true)
+
+        if reactor.getHohlraum()["count"] >= 1 then
+            reactorHohlraumAvail = true
+        else
+            reactorHohlraumAvail = false
+        end
+    end
+end
+
+function input()
+    while(true) do
+        local event, side, x, y = os.pullEvent("monitor_touch")
+        if(side == monitor2string) then
+            -- 1
+            if(x == 43 and y == 16) then
+                if(updateInjectionRateCurrentField <= 2) then
+                    updateInjectionRate[updateInjectionRateCurrentField] = 1
+                end
+                if(updateInjectionRateCurrentField <= 2) then
+                    updateInjectionRateCurrentField = updateInjectionRateCurrentField + 1
+                end
+            end
+            -- 2
+            if(x == 46 and y == 16) then
+                if(updateInjectionRateCurrentField <= 2) then
+                    updateInjectionRate[updateInjectionRateCurrentField] = 2
+                end
+                if(updateInjectionRateCurrentField <= 2) then
+                    updateInjectionRateCurrentField = updateInjectionRateCurrentField + 1
+                end
+            end
+            -- 3
+            if(x == 49 and y == 16) then
+                if(updateInjectionRateCurrentField <= 2) then
+                    updateInjectionRate[updateInjectionRateCurrentField] = 3
+                end
+                if(updateInjectionRateCurrentField <= 2) then
+                    updateInjectionRateCurrentField = updateInjectionRateCurrentField + 1
+                end
+            end
+            -- 4
+            if(x == 43 and y == 17) then
+                if(updateInjectionRateCurrentField <= 2) then
+                    updateInjectionRate[updateInjectionRateCurrentField] = 4
+                end
+                if(updateInjectionRateCurrentField <= 2) then
+                    updateInjectionRateCurrentField = updateInjectionRateCurrentField + 1
+                end
+            end
+            -- 5
+            if(x == 46 and y == 17) then
+                if(updateInjectionRateCurrentField <= 2) then
+                    updateInjectionRate[updateInjectionRateCurrentField] = 5
+                end
+                if(updateInjectionRateCurrentField <= 2) then
+                    updateInjectionRateCurrentField = updateInjectionRateCurrentField + 1
+                end
+            end
+            -- 6
+            if(x == 49 and y == 17) then
+                if(updateInjectionRateCurrentField <= 2) then
+                    updateInjectionRate[updateInjectionRateCurrentField] = 6
+                end
+                if(updateInjectionRateCurrentField <= 2) then
+                    updateInjectionRateCurrentField = updateInjectionRateCurrentField + 1
+                end
+            end
+            -- 7
+            if(x == 43 and y == 18) then
+                if(updateInjectionRateCurrentField <= 2) then
+                    updateInjectionRate[updateInjectionRateCurrentField] = 7
+                end
+                if(updateInjectionRateCurrentField <= 2) then
+                    updateInjectionRateCurrentField = updateInjectionRateCurrentField + 1
+                end
+            end
+            -- 8
+            if(x == 46 and y == 18) then
+                if(updateInjectionRateCurrentField <= 2) then
+                    updateInjectionRate[updateInjectionRateCurrentField] = 8
+                end
+                if(updateInjectionRateCurrentField <= 2) then
+                    updateInjectionRateCurrentField = updateInjectionRateCurrentField + 1
+                end
+            end
+            -- 9
+            if(x == 49 and y == 18) then
+                if(updateInjectionRateCurrentField <= 2) then
+                    updateInjectionRate[updateInjectionRateCurrentField] = 9
+                end
+                if(updateInjectionRateCurrentField <= 2) then
+                    updateInjectionRateCurrentField = updateInjectionRateCurrentField + 1
+                end
+            end
+            -- C
+            if(x == 43 and y == 19) then
+                updateInjectionRate = {"0","0"}
+                updateInjectionRateCurrentField = 1
+            end
+            -- 0
+            if(x == 46 and y == 19) then
+                if(updateInjectionRateCurrentField <= 2) then
+                    updateInjectionRate[updateInjectionRateCurrentField] = 0
+                end
+                if(updateInjectionRateCurrentField <= 2) then
+                    updateInjectionRateCurrentField = updateInjectionRateCurrentField + 1
+                end
+            end
+            -- S
+            if(x == 49 and y == 19) then
+                updateInjectionRateValueCalc = updateInjectionRate[1] .. updateInjectionRate[2]
+                updateInjectionRateValue = tonumber(updateInjectionRateValueCalc)
+                if updateInjectionRateValue <= 99 then
+                    if updateInjectionRateValue >= reactorMinInjectionRate then
+                        reactorRequiredInjectionRate = updateInjectionRateValue
+                    else
+                        reactorEnabled = false
+                    end
+                end
+                updateInjectionRate = {"0","0"}
+                updateInjectionRateCurrentField = 1
+            end
+            if(x >= 10 and x <= 13 and y == 18) then
+                reactorEnabled = true
+            end
+            if(x >= 14 and x <= 18 and y == 18) then
+                reactorEnabled = false
+            end
+        end
+        -- print("The monitor on side " .. side .. " was touched at (" .. x .. ", " .. y .. ")")
     end
 end
 
 function main()
     while true do
+        updateInjectionRateValueString = ""
+        for i = 1, 2 do
+            if i == updateInjectionRateCurrentField then
+                updateInjectionRateValueString = updateInjectionRateValueString .. "x"
+            else
+                updateInjectionRateValueString = updateInjectionRateValueString .. updateInjectionRate[i]
+            end
+        end
+
         updateMonitor1()
         updateMonitor2()
+
+        manageInjectionRate()
 
         stillAliveDisplay()
 
@@ -267,4 +453,4 @@ monitor1.clear()
 monitor2.clear()
 monitor3.clear()
 
-parallel.waitForAll(main, values)
+parallel.waitForAll(main, values, input)
