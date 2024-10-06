@@ -164,7 +164,7 @@ function updateMonitor2()
     monitor2.write("LASER CHARGE:")
     monitor2.setCursorPos(1,10)
     monitor2.clearLine()
-    monitor2.write(math.ceil(amplifierChargeAmount / 1000000) .. "MFE / " .. math.ceil(amplifierChargeCapacity / 1000000) .. " MFE" .. " (" .. math.ceil(amplifierChargePercentage) .. "%)")
+    monitor2.write(math.ceil(amplifierChargeAmount / 1000000) .. "MFE / " .. math.ceil(amplifierChargeCapacity / 1000000) .. " MFE" .. " (" .. math.ceil(amplifierChargePercentage * 100) .. "%)")
 
     monitor2.setBackgroundColor(colors.black)
     monitor2.setCursorPos(42,14)
