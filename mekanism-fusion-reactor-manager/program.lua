@@ -1,9 +1,7 @@
-local reactorString = ""
-local laserAmplifierString = ""
-local turbineString = ""
-local monitor1string = ""
-local monitor2string = ""
-local monitor3string = ""
+local reactorString = "fusionReactorLogicAdapter_0"
+local laserAmplifierString = "laserAmplifier_0"
+local monitor1string = "monitor_4"
+local monitor2string = "monitor_5"
 local fuelValveSideString = ""
 
 -- values
@@ -39,12 +37,17 @@ local reactorMinInjectionRate = -1
 
 local reactorHohlraumAvail = false
 
+local amplifierChargeAmount = -1;
+local amplifierChargeCapacity = -1
+local amplifierChargePercentage = -1
+
+local testtest = -1
+
 local reactorEnabled = false
 local reactorRequiredInjectionRate = 2
 
 local monitor1 = peripheral.wrap(monitor1string)
 local monitor2 = peripheral.wrap(monitor2string)
-local monitor3 = peripheral.wrap(monitor3string)
 
 local stillAliveString = "."
 local stillAliveTimer = 20
@@ -153,8 +156,15 @@ function updateMonitor2()
     if reactorHohlraumAvail == true then
         monitor2.write("available")
     else
-        monitor2.write("available")
+        monitor2.write("-----")
     end
+
+    monitor2.setCursorPos(1, 9)
+    monitor2.clearLine()
+    monitor2.write("LASER CHARGE:")
+    monitor2.setCursorPos(1,10)
+    monitor2.clearLine()
+    monitor2.write(math.ceil(amplifierChargeAmount / 1000000) .. "MFE / " .. math.ceil(amplifierChargeCapacity / 1000000) .. " MFE" .. " (" .. math.ceil(amplifierChargePercentage) .. "%)")
 
     monitor2.setBackgroundColor(colors.black)
     monitor2.setCursorPos(42,14)
@@ -224,7 +234,7 @@ function manageInjectionRate()
     local reactor = peripheral.wrap(reactorString)
 
     if reactor ~= nil then
-        if reactorEnabled == true then
+        if reactorEnabled == true and reactorRequiredInjectionRate >= 2 and reactorRequiredInjectionRate <= 98 then
             if reactorInjectionRate ~= reactorRequiredInjectionRate then
                 reactor.setInjectionRate(reactorRequiredInjectionRate)
             end
@@ -234,6 +244,14 @@ function manageInjectionRate()
             end
         end
     end
+end
+
+function manageAmplifier()
+    local amplifier = peripheral.wrap(laserAmplifierString)
+
+    amplifier.setRedstoneMode("HIGH")
+    amplifier.setMinThreshold(0)
+    amplifier.setMaxThreshold(5000000000)
 end
 
 function values()
@@ -264,7 +282,7 @@ function values()
         reactorSteamFilledPercentage = reactor.getSteamFilledPercentage()
 
         reactorProductionRate = reactor.getProductionRate()
-        reactorPassiveGeneration = reactor.getPassiveGeneration(true)/2.5
+        reactorPassiveGeneration = reactor.getPassiveGeneration(true) / 2.5
 
         reactorInjectionRate = reactor.getInjectionRate()
         reactorMinInjectionRate = reactor.getMinInjectionRate(true)
@@ -274,7 +292,21 @@ function values()
         else
             reactorHohlraumAvail = false
         end
+
+        local amplifier = peripheral.wrap(laserAmplifierString)
+
+        amplifierChargeAmount = amplifier.getEnergy() / 2.5
+        amplifierChargeCapacity = amplifier.getMaxEnergy() / 2.5
+        amplifierChargePercentage = amplifier.getEnergyFilledPercentage()
+        testtest = amplifier.getRedstoneMode()
+
+        sleep(0.05)
     end
+end
+
+function ignite()
+    local amplifier = peripheral.wrap(laserAmplifierString)
+    amplifier.setRedstoneMode("DISABLED")
 end
 
 function input()
@@ -380,7 +412,7 @@ function input()
             if(x == 49 and y == 19) then
                 updateInjectionRateValueCalc = updateInjectionRate[1] .. updateInjectionRate[2]
                 updateInjectionRateValue = tonumber(updateInjectionRateValueCalc)
-                if updateInjectionRateValue <= 99 then
+                if updateInjectionRateValue <= 98 then
                     if updateInjectionRateValue >= reactorMinInjectionRate then
                         reactorRequiredInjectionRate = updateInjectionRateValue
                     else
@@ -390,11 +422,16 @@ function input()
                 updateInjectionRate = {"0","0"}
                 updateInjectionRateCurrentField = 1
             end
+            -- ON
             if(x >= 10 and x <= 13 and y == 18) then
                 reactorEnabled = true
             end
+            -- OFF
             if(x >= 14 and x <= 18 and y == 18) then
                 reactorEnabled = false
+            end
+            if reactorEnabled and (x >= 11 and x <= 18 and y == 19) then
+                ignite()
             end
         end
         -- print("The monitor on side " .. side .. " was touched at (" .. x .. ", " .. y .. ")")
@@ -416,6 +453,7 @@ function main()
         updateMonitor2()
 
         manageInjectionRate()
+        manageAmplifier()
 
         stillAliveDisplay()
 
@@ -425,32 +463,26 @@ end
 
 monitor1.clear()
 monitor2.clear()
-monitor3.clear()
 
 monitor1.setCursorPos(1,1)
 monitor2.setCursorPos(1,1)
-monitor3.setCursorPos(1,1)
 
 monitor1.write("Fusion Reactor Manager")
 monitor2.write("Fusion Reactor Manager")
-monitor3.write("Fusion Reactor Manager")
 
 monitor1.setCursorPos(1,19)
 monitor2.setCursorPos(1,19)
-monitor3.setCursorPos(1,19)
 
 monitor1.write("Initializing...")
 monitor2.write("Initializing...")
-monitor3.write("Initializing...")
 
 sleep(3)
 
 monitor1.setCursorPos(1,1)
 monitor2.setCursorPos(1,1)
-monitor3.setCursorPos(1,1)
 
 monitor1.clear()
 monitor2.clear()
-monitor3.clear()
 
-parallel.waitForAll(main, values, input)
+print("Mekanism Fission Reactor Control Program")
+parallel.waitForAny(main, values, input)
